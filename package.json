@@ -16,6 +16,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@contentful/rich-text-html-renderer": "^16.3.3",
     "autoprefixer": "^10.4.17",
     "contentful": "^10.6.19",
     "gatsby": "^5.13.1",

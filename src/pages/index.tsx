@@ -19,12 +19,10 @@ const IndexPage = () => {
       limit: 3,
       order: '-sys.createdAt', // ignore ts error
       content_type: 'blog'
-    })
-      .then((data) => {
-        savePosts(data.items)
-        saveTotal(data.total)
-      })
-      .catch((err) => console.error(err))
+    }).then((data) => {
+      savePosts(data.items)
+      saveTotal(data.total)
+    }).catch((err) => console.error(err))
   }, []) // query once
 
   return (
