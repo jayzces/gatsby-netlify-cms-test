@@ -1,6 +1,7 @@
-import { documentToHtmlString } from '@contentful/rich-text-html-renderer'
+import { documentToHtmlString, Options } from '@contentful/rich-text-html-renderer'
 import { BLOCKS, INLINES } from '@contentful/rich-text-types'
 import { createClient } from 'contentful'
+import { navigate } from 'gatsby';
 import React, { useState, useEffect } from 'react'
 import Seo from '../../components/seo'
 import Layout from '../../components/layout'
@@ -19,30 +20,33 @@ const BlogPost = ({ params }: any) => {
       content_type: 'blog',
       'fields.slug': slug,
     }).then((data) => {
-      if (data.items?.length < 1) return;
       const entry = data.items[0]
-      if (!entry || !entry.fields || !entry.fields.body) return
+
+      if (!entry || !entry.fields || !entry.fields.body) {
+        navigate('/404')
+        return
+      }
 
       savePost(entry as any)
 
       // generated rendered html
       const rawRichTextField: any = entry.fields.body
-      const renderOptions: any = {
+      const renderOptions: Partial<Options> = {
         renderNode: {
+          // html only, not jsx
           [INLINES.EMBEDDED_ENTRY]: (node: any) => {
             const { title, slug } = node.data.target.fields
             return `<div class="inline-entry">
               <div class="inline-entry__title">
-                <a href="/blog/${slug}" target="_blank">${title}</a>
+                <a href="/blog/${slug}">${title}</a>
               </div>
             </div>`
           },
           [BLOCKS.EMBEDDED_ENTRY]: (node: any) => {
             const { title, slug } = node.data.target.fields
-            // has to html otherwise will render [object Object]
             return `<div class="embedded-entry">
               <div class="embeddded-entry__title">
-                <a href="/blog/${slug}" target="_blank">${title}</a>
+                <a href="/blog/${slug}">${title}</a>
               </div>
             </div>`
           },
