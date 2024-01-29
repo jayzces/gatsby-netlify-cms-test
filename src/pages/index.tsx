@@ -9,19 +9,18 @@ import Seo from '../components/seo'
 const IndexPage = () => {
   const [posts, savePosts] = useState(new Array<any>())
   const [total, saveTotal] = useState(0)
-  const client = createClient({
-    space: process.env.GATSBY_SPACE_ID || '',
-    accessToken: process.env.GATSBY_API_KEY || ''
-  })
 
   useEffect(() => {
-    client.getEntries({
+    createClient({
+      space: process.env.GATSBY_SPACE_ID || '',
+      accessToken: process.env.GATSBY_API_KEY || ''
+    }).getEntries({
       limit: 3,
       order: '-sys.createdAt', // ignore ts error
       content_type: 'blog'
     }).then((data) => {
-      savePosts(data.items)
-      saveTotal(data.total)
+      if (data.items) savePosts(data.items)
+      if (data.total) saveTotal(data.total)
     }).catch((err) => console.error(err))
   }, []) // query once
 
@@ -43,7 +42,7 @@ const IndexPage = () => {
               <li>
                 <Link to={'/blog/' + p.fields.slug}>{p.fields.title}</Link>
               </li>
-              {p.fields.summary ? <li >{p.fields.summary}</li> : ''}
+              {p.fields?.summary ? <li >{p.fields.summary}</li> : ''}
             </ul>
           </div>
         ))}

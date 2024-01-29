@@ -9,19 +9,19 @@ import { Post } from '../../typings/models'
 const BlogPost = ({ params }: any) => {
   const [post, savePost] = useState({} as Post)
   const [body, saveBody] = useState('')
-  const client = createClient({
-    space: process.env.GATSBY_SPACE_ID || '',
-    accessToken: process.env.GATSBY_API_KEY || ''
-  })
   const slug = params['*']
 
   useEffect(() => {
-    client.getEntries({
+    createClient({
+      space: process.env.GATSBY_SPACE_ID || '',
+      accessToken: process.env.GATSBY_API_KEY || ''
+    }).getEntries({
       content_type: 'blog',
       'fields.slug': slug,
     }).then((data) => {
+      if (data.items?.length < 1) return;
       const entry = data.items[0]
-      if (!entry) return
+      if (!entry || !entry.fields || !entry.fields.body) return
 
       savePost(entry as any)
 
@@ -58,7 +58,7 @@ const BlogPost = ({ params }: any) => {
       }
 
       saveBody(documentToHtmlString(rawRichTextField, renderOptions))
-    })
+    }).catch((err) => console.error(err))
   }, []) // query once
 
   return !post ? '' : (
