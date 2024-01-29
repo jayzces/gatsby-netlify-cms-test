@@ -40,7 +40,7 @@ const config: GatsbyConfig = {
       },
       __key: "images"
     }
-]
+  ]
 };
 
 export default config;
