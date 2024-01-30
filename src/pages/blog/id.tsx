@@ -10,6 +10,7 @@ import { Post } from '../../typings/models'
 const BlogPost = ({ params }: any) => {
   const [post, savePost] = useState({} as Post)
   const [body, saveBody] = useState(null as React.ReactNode)
+  const [assets, saveAssets] = useState({} as any)
   const slug = params['*']
 
   useEffect(() => {
@@ -28,6 +29,8 @@ const BlogPost = ({ params }: any) => {
       }
 
       savePost(entry as any)
+      const transformedAssets = data.includes?.Asset?.reduce((acc, curr) => ({ ...acc, [curr.sys.id]: curr.fields }), {})
+      saveAssets(transformedAssets)
 
       // generated rendered html
       const rawRichTextField: any = entry.fields.body
@@ -53,7 +56,8 @@ const BlogPost = ({ params }: any) => {
               <img src={`https://${file.url}`}
                 height={file.details.image.height}
                 width={file.details.image.width}
-                alt={description} />
+                alt={description}
+                className='max-w-full h-auto' />
             )
           },
         }
@@ -63,9 +67,22 @@ const BlogPost = ({ params }: any) => {
     }).catch((err) => console.error(err))
   }, [slug]) // query once
 
+  function getImage(imageId: string) {
+    const { details, url } = assets[imageId].file
+    return <img src={url}
+      width={details.image.width}
+      height={details.image.height}
+      alt={assets[imageId].description}
+      className='max-w-full h-auto' />
+  }
+
   return !post ? '' : (
     <Layout pageTitle={post.fields?.title}>
       <Seo title={post.fields?.title} />
+
+      {post.fields?.imagePreview
+        ? getImage(post.fields.imagePreview.sys.id)
+        : ''}
 
       {body}
     </Layout>
